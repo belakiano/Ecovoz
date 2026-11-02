@@ -1,0 +1,15 @@
+# segredos e dados locais
+firmware/src/segredos.h
+*.db
+dados/
+
+# gerados
+__pycache__/
+*.pyc
+.pytest_cache/
+node_modules/
+firmware/.pio/
+testes/cli_atributos
+testes/teste_alerta
+treino/resultados/*.keras
+treino/resultados/*.log
