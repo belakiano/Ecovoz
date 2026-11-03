@@ -1,0 +1,122 @@
+[
+ {
+  "peca": "corpo",
+  "fechada": true,
+  "volume_cm3": 187.92,
+  "massa_g_estimada": 110.6,
+  "dimensoes_mm": [
+   132.0,
+   91.0,
+   62.1
+  ],
+  "componentes": 1
+ },
+ {
+  "peca": "tampa",
+  "fechada": true,
+  "volume_cm3": 45.17,
+  "massa_g_estimada": 26.6,
+  "dimensoes_mm": [
+   132.0,
+   87.5,
+   9.0
+  ],
+  "componentes": 1
+ },
+ {
+  "peca": "plataforma",
+  "fechada": true,
+  "volume_cm3": 16.99,
+  "massa_g_estimada": 10.0,
+  "dimensoes_mm": [
+   97.0,
+   61.0,
+   3.0
+  ],
+  "componentes": 1
+ },
+ {
+  "peca": "anel_mic",
+  "fechada": true,
+  "volume_cm3": 0.5,
+  "massa_g_estimada": 0.3,
+  "dimensoes_mm": [
+   18.0,
+   18.0,
+   5.0
+  ],
+  "componentes": 1
+ },
+ {
+  "peca": "berco_painel",
+  "fechada": true,
+  "volume_cm3": 101.03,
+  "massa_g_estimada": 59.5,
+  "dimensoes_mm": [
+   168.0,
+   143.6,
+   36.9
+  ],
+  "componentes": 1
+ },
+ {
+  "peca": "berco_painel_local",
+  "fechada": true,
+  "volume_cm3": 101.03,
+  "massa_g_estimada": 59.5,
+  "dimensoes_mm": [
+   168.0,
+   146.0,
+   7.0
+  ],
+  "componentes": 1
+ },
+ {
+  "peca": "perna_0",
+  "fechada": true,
+  "volume_cm3": 2.84,
+  "massa_g_estimada": 1.7,
+  "dimensoes_mm": [
+   12.0,
+   12.0,
+   28.6
+  ],
+  "componentes": 1
+ },
+ {
+  "peca": "perna_1",
+  "fechada": true,
+  "volume_cm3": 2.84,
+  "massa_g_estimada": 1.7,
+  "dimensoes_mm": [
+   12.0,
+   12.0,
+   28.6
+  ],
+  "componentes": 1
+ },
+ {
+  "peca": "perna_2",
+  "fechada": true,
+  "volume_cm3": 1.87,
+  "massa_g_estimada": 1.1,
+  "dimensoes_mm": [
+   12.0,
+   12.0,
+   19.3
+  ],
+  "componentes": 1
+ },
+ {
+  "peca": "perna_3",
+  "fechada": true,
+  "volume_cm3": 1.87,
+  "massa_g_estimada": 1.1,
+  "dimensoes_mm": [
+   12.0,
+   12.0,
+   19.3
+  ],
+  "componentes": 1
+ }
+]

@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<style>
+  html,body{margin:0;background:#f4f3ee;font-family:Helvetica,Arial,sans-serif}
+  #c{display:block}
+    #ov{position:absolute;left:0;top:0;pointer-events:none}
+  .pil{position:absolute;height:28px;margin-top:-14px;border-radius:14px;background:#14342a;color:#fff;font:500 15px/28px Helvetica,Arial,sans-serif;padding:0 14px 0 4px;white-space:nowrap}
+  .pil b{display:inline-block;width:22px;height:22px;margin:3px 8px 3px 3px;border-radius:50%;background:#fff;color:#14342a;text-align:center;line-height:22px;font-size:13px}
+  #tit{position:absolute;left:28px;top:22px;font-size:20px;font-weight:600;color:#14342a}
+  #sub{position:absolute;left:28px;top:50px;font-size:14px;color:#555}
+</style>
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js"}}</script>
+</head><body>
+<canvas id="c"></canvas><div id="tit"></div><div id="sub"></div><svg id="ov"></svg>
+<script type="module">
+import * as THREE from "three";
+import {STLLoader} from "/node_modules/three/examples/jsm/loaders/STLLoader.js";
+const cores = {corpo:0x6f8a70, plataforma:0xd2a640, anel:0xe2e0d8, tampa:0x93aa90, perna:0xb7b7ae, berco:0x3f5d4c, painel:0x1c2f5f};
+const nomes = {corpo:"Corpo", plataforma:"Plataforma da placa", anel:"Anel do microfone", tampa:"Tampa com vedação", perna:"Pernas (4)", berco:"Berço do painel", painel:"Painel solar (comprado, não impresso)"};
+const num = {corpo:1, plataforma:2, anel:3, tampa:4, perna:5, berco:6, painel:7};
+const loader = new STLLoader();
+const carregar = u => new Promise(r => loader.load(u, g => r(g)));
+
+window.montar = async (cfg) => {
+  const W = cfg.w, H = cfg.h;
+  const cv = document.getElementById("c"); cv.width = W; cv.height = H; cv.style.width = W+"px"; cv.style.height = H+"px";
+  document.querySelectorAll(".rot").forEach(e => e.remove());
+  const r = new THREE.WebGLRenderer({canvas: cv, antialias: true, preserveDrawingBuffer: true});
+  r.setPixelRatio(1); r.setSize(W, H); r.setClearColor(0xf4f3ee);
+  const sc = new THREE.Scene();
+  sc.add(new THREE.HemisphereLight(0xffffff, 0xb9b6a8, 0.95));
+  const d1 = new THREE.DirectionalLight(0xffffff, 1.25); d1.position.set(160, 120, 300); sc.add(d1);
+  const d2 = new THREE.DirectionalLight(0xffffff, 0.5); d2.position.set(-200, -150, 120); sc.add(d2);
+  const d3 = new THREE.DirectionalLight(0xffffff, 0.9); d3.position.set(100, 200, -300); sc.add(d3);
+  const grupo = new THREE.Group(); sc.add(grupo);
+  const caixas = {};
+  for (const p of cfg.partes) {
+    const g = await carregar("/stl/" + p.arq + ".stl");
+    g.computeVertexNormals();
+    const m = new THREE.Mesh(g, new THREE.MeshStandardMaterial({color: cores[p.tipo], roughness:.78, metalness:.02, flatShading:false, side:THREE.DoubleSide, polygonOffset:true, polygonOffsetFactor:1, polygonOffsetUnits:1}));
+    m.position.z = p.dz || 0; m.userData.tipo = p.tipo;
+    const e = new THREE.LineSegments(new THREE.EdgesGeometry(g, 28), new THREE.LineBasicMaterial({color:0x1b1b1b, transparent:true, opacity:.55}));
+    e.position.z = p.dz || 0;
+    grupo.add(m); grupo.add(e);
+    g.computeBoundingBox();
+    const bb = g.boundingBox.clone().translate(new THREE.Vector3(0,0,p.dz||0));
+    (caixas[p.tipo] ||= []).push(bb);
+  }
+  for (const l of (cfg.linhas||[])) {
+    const geo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(...l[0]), new THREE.Vector3(...l[1])]);
+    const ln = new THREE.Line(geo, new THREE.LineDashedMaterial({color:0x555555, dashSize:3, gapSize:3})); ln.computeLineDistances(); sc.add(ln);
+  }
+  const box = new THREE.Box3(); Object.values(caixas).flat().forEach(b => box.union(b));
+  const ctr = box.getCenter(new THREE.Vector3());
+  const dir = new THREE.Vector3(...cfg.dir).normalize();
+  const cam = new THREE.OrthographicCamera(-1,1,1,-1,-2000,2000);
+  cam.up.set(0,0,1);
+  cam.position.copy(ctr).addScaledVector(dir, 800); cam.lookAt(ctr);
+  cam.updateMatrixWorld(); cam.updateProjectionMatrix();
+  // enquadramento: projeta os 8 vértices de cada caixa na tela da câmera
+  const inv = cam.matrixWorldInverse; let mnx=1e9,mxx=-1e9,mny=1e9,mxy=-1e9;
+  Object.values(caixas).flat().forEach(b => { for (const x of [b.min.x,b.max.x]) for (const y of [b.min.y,b.max.y]) for (const z of [b.min.z,b.max.z]) {
+    const v = new THREE.Vector3(x,y,z).applyMatrix4(inv); mnx=Math.min(mnx,v.x); mxx=Math.max(mxx,v.x); mny=Math.min(mny,v.y); mxy=Math.max(mxy,v.y); }});
+  const m = cfg.margem || 0.06, asp = W/H*(1-(cfg.coluna||330)/W);
+  let hw = (mxx-mnx)/2*(1+m*2), hh = (mxy-mny)/2*(1+m*2);
+  if (hw/hh < asp) hw = hh*asp; else hh = hw/asp;
+  const res = (cfg.coluna || 330) / W;
+  hw = hw / (1 - res); const cx = (mxx+mnx)/2 + hw*res, cy = (mxy+mny)/2 + (cfg.deslocY||0)*hh;
+  cam.left = cx-hw; cam.right = cx+hw; cam.top = cy+hh; cam.bottom = cy-hh; cam.updateProjectionMatrix();
+  r.render(sc, cam);
+  // numeração: âncora em ponto visível de cada peça (raios pela tela) e rótulo na coluna da direita
+  const alvos = grupo.children.filter(o => o.isMesh);
+  const rc = new THREE.Raycaster(); const ov = document.getElementById("ov");
+  ov.setAttribute("width", W); ov.setAttribute("height", H); ov.innerHTML = "";
+  document.querySelectorAll(".pil").forEach(e => e.remove());
+  const itens = [];
+  for (const [tipo, bbs] of Object.entries(caixas)) {
+    const cand = [];
+    for (let i = 0; i < 70; i++) for (let j = 0; j < 70; j++) {
+      const nx = (i + .5) / 70 * 2 - 1, ny = (j + .5) / 70 * 2 - 1;
+      rc.setFromCamera(new THREE.Vector2(nx, ny), cam);
+      const hit = rc.intersectObjects(alvos, false)[0];
+      if (hit && hit.object.userData.tipo === tipo) cand.push({nx, ny});
+    }
+    if (cand.length < 3) continue;
+    const mx = cand.reduce((a, c) => a + c.nx, 0) / cand.length, my = cand.reduce((a, c) => a + c.ny, 0) / cand.length;
+    cand.sort((a, b) => ((a.nx-mx)**2 + (a.ny-my)**2) - ((b.nx-mx)**2 + (b.ny-my)**2));
+    const c = cand[0];
+    itens.push({tipo, x: (c.nx + 1) / 2 * W, y: (1 - c.ny) / 2 * H});
+  }
+  itens.sort((a, b) => a.y - b.y);
+  let ultimo = -1e9; const xCol = W - (cfg.coluna || 330);
+  for (const it of itens) {
+    it.ly = Math.max(it.y, ultimo + 38); ultimo = it.ly;
+  }
+  for (const it of itens) {
+    ov.insertAdjacentHTML("beforeend", `<polyline points="${it.x},${it.y} ${xCol-14},${it.ly} ${xCol},${it.ly}" fill="none" stroke="#14342a" stroke-width="1.6"/><circle cx="${it.x}" cy="${it.y}" r="4.5" fill="#14342a" stroke="#fff" stroke-width="1.5"/>`);
+    const el = document.createElement("div"); el.className = "pil"; el.innerHTML = `<b>${num[it.tipo]}</b>${nomes[it.tipo]}`;
+    el.style.left = xCol + "px"; el.style.top = it.ly + "px"; document.body.appendChild(el);
+  }
+  document.getElementById("tit").textContent = cfg.titulo; document.getElementById("sub").textContent = cfg.sub || "";
+  return true;
+};
+window.pronto = true;
+</script></body></html>

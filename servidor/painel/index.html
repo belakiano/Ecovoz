@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EcoVoz Painel de Fiscalização</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+  :root { --fundo:#0e1f1a; --painel:#14302a; --linha:#24483f; --texto:#e8f1ee; --suave:#9db8b0; --alerta:#e5484d; --ok:#4fbf8f; --aviso:#f0b429; --realce:#7ee0b4; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--fundo); color:var(--texto); font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; height:100vh; display:grid; grid-template-columns:380px 1fr; }
+  header { grid-column:1/-1; display:flex; align-items:center; gap:16px; padding:10px 16px; background:var(--painel); border-bottom:1px solid var(--linha); }
+  header h1 { margin:0; font-size:17px; letter-spacing:.02em; }
+  header .info { color:var(--suave); font-size:13px; margin-left:auto; }
+  body { grid-template-rows:auto 1fr; }
+  #lista { overflow:auto; padding:12px; display:flex; flex-direction:column; gap:10px; border-right:1px solid var(--linha); }
+  #mapa { min-height:0; }
+  .cartao { background:var(--painel); border:1px solid var(--linha); border-radius:10px; padding:12px; cursor:pointer; }
+  .cartao.novo { border-color:var(--alerta); box-shadow:0 0 0 1px var(--alerta) inset; }
+  .cartao h2 { margin:0 0 4px; font-size:15px; display:flex; justify-content:space-between; gap:8px; }
+  .etq { font-size:12px; padding:2px 8px; border-radius:99px; background:var(--linha); color:var(--texto); white-space:nowrap; }
+  .etq.alerta { background:var(--alerta); } .etq.aviso { background:var(--aviso); color:#222; } .etq.ok { background:var(--ok); color:#0b1b16; }
+  .meta { color:var(--suave); font-size:13px; display:grid; grid-template-columns:1fr 1fr; gap:2px 12px; }
+  .acoes { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  button, select, a.botao { background:transparent; color:var(--texto); border:1px solid var(--realce); border-radius:8px; padding:6px 10px; font:inherit; cursor:pointer; text-decoration:none; font-size:13px; }
+  button:hover, a.botao:hover { background:rgba(126,224,180,.12); }
+  select { background:var(--painel); border-color:var(--linha); }
+  .vazio { color:var(--suave); text-align:center; padding:32px 12px; }
+  h3 { margin:6px 4px 0; font-size:12px; text-transform:uppercase; letter-spacing:.08em; color:var(--suave); }
+  @media (max-width:760px) { body { grid-template-columns:1fr; grid-template-rows:auto 45vh 1fr; } #lista { border-right:0; order:2; } #mapa { order:1; } }
+</style>
+</head>
+<body>
+<header><h1>EcoVoz: Sistema de Fiscalização</h1><span class="info" id="atualizado">carregando</span></header>
+<section id="lista" aria-label="Alertas e sensores"></section>
+<div id="mapa" role="application" aria-label="Mapa dos sensores e alertas"></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+"use strict";
+const mapa = L.map("mapa").setView([-5.7333, -52.65], 8);
+L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18, attribution: "&copy; OpenStreetMap" }).addTo(mapa);
+const camada = L.layerGroup().addTo(mapa);
+let token = "";
+
+const cls = { motosserra: "Motosserra", motor: "Motor", fogo: "Fogo (experimental)" };
+function quando(iso) {
+  const s = Math.max(0, (Date.now() - new Date(iso).getTime()) / 1000);
+  if (s < 90) return `há ${Math.round(s)} s`;
+  if (s < 5400) return `há ${Math.round(s / 60)} min`;
+  if (s < 172800) return `há ${Math.round(s / 3600)} h`;
+  return `há ${Math.round(s / 86400)} dias`;
+}
+function el(tag, props = {}, ...filhos) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(props)) { if (k === "class") e.className = v; else if (k === "onclick") e.onclick = v; else e.setAttribute(k, v); }
+  for (const f of filhos) e.append(f);
+  return e;
+}
+async function mudarStatus(id, status) {
+  if (!token) token = prompt("Token do servidor (ECOVOZ_TOKEN)") || "";
+  const r = await fetch(`/api/alertas/${id}/status`, { method: "POST", headers: { "Content-Type": "application/json", "X-EcoVoz-Token": token }, body: JSON.stringify({ status }) });
+  if (r.status === 401) token = "";
+  carregar();
+}
+function cartaoAlerta(a) {
+  const recente = (Date.now() - new Date(a.recebido_em).getTime()) < 15 * 60 * 1000 && a.status === "novo";
+  const rotulo = a.status === "novo" ? "novo" : a.status.replace("_", " ");
+  const sel = el("select", { "aria-label": "Situação do alerta" });
+  for (const [v, t] of [["novo", "Novo"], ["em_verificacao", "Em verificação"], ["confirmado", "Confirmado"], ["falso_alarme", "Falso alarme"]]) {
+    const o = el("option", { value: v }, t); if (v === a.status) o.selected = true; sel.append(o);
+  }
+  sel.onchange = () => mudarStatus(a.id, sel.value);
+  const c = el("article", { class: "cartao" + (recente ? " novo" : "") },
+    el("h2", {}, el("span", {}, `${cls[a.classe_nome] || a.classe_nome} · sensor ${a.sensor}`), el("span", { class: "etq " + (recente ? "alerta" : "") }, rotulo)),
+    el("div", { class: "meta" },
+      el("span", {}, quando(a.recebido_em)), el("span", {}, `confiança ${Math.round(a.confianca * 100)}%`),
+      el("span", {}, `${a.latitude.toFixed(4)}, ${a.longitude.toFixed(4)}`), el("span", {}, `bateria ${a.bateria}%`)),
+    el("div", { class: "acoes" }, sel,
+      el("a", { class: "botao", href: `https://www.google.com/maps/dir/?api=1&destination=${a.latitude},${a.longitude}`, target: "_blank", rel: "noopener" }, "Rota")));
+  c.onclick = (ev) => { if (ev.target.tagName !== "SELECT" && ev.target.tagName !== "A") mapa.setView([a.latitude, a.longitude], 14); };
+  return c;
+}
+function cartaoSensor(s) {
+  const baixa = s.bateria < 25;
+  return el("article", { class: "cartao" },
+    el("h2", {}, el("span", {}, `Sensor ${s.sensor}`), el("span", { class: "etq " + (s.sem_sinal ? "aviso" : "ok") }, s.sem_sinal ? "sem sinal" : "ativo")),
+    el("div", { class: "meta" }, el("span", {}, `última mensagem ${quando(s.ultima_msg)}`), el("span", { class: baixa ? "aviso" : "" }, `bateria ${s.bateria}%`)));
+}
+async function carregar() {
+  try {
+    const [alertas, sensores] = await Promise.all([fetch("/api/alertas?limite=50").then(r => r.json()), fetch("/api/sensores").then(r => r.json())]);
+    const lista = document.getElementById("lista"); lista.replaceChildren(); camada.clearLayers();
+    lista.append(el("h3", {}, `Alertas (${alertas.length})`));
+    if (!alertas.length) lista.append(el("div", { class: "vazio" }, "Nenhum alerta registrado."));
+    for (const a of alertas) {
+      lista.append(cartaoAlerta(a));
+      const recente = (Date.now() - new Date(a.recebido_em).getTime()) < 15 * 60 * 1000 && a.status === "novo";
+      L.circleMarker([a.latitude, a.longitude], { radius: recente ? 11 : 7, color: "#e5484d", fillColor: "#e5484d", fillOpacity: recente ? .7 : .35, weight: 2 })
+        .bindTooltip(`${cls[a.classe_nome] || a.classe_nome} · sensor ${a.sensor} · ${quando(a.recebido_em)}`).addTo(camada);
+    }
+    lista.append(el("h3", {}, `Sensores (${sensores.length})`));
+    for (const s of sensores) {
+      lista.append(cartaoSensor(s));
+      L.circleMarker([s.latitude, s.longitude], { radius: 5, color: s.sem_sinal ? "#f0b429" : "#4fbf8f", fillOpacity: .9, weight: 1 })
+        .bindTooltip(`Sensor ${s.sensor} · bateria ${s.bateria}%`).addTo(camada);
+    }
+    document.getElementById("atualizado").textContent = "atualizado " + new Date().toLocaleTimeString("pt-BR");
+  } catch (e) { document.getElementById("atualizado").textContent = "sem conexão com o servidor"; }
+}
+carregar(); setInterval(carregar, 10000);
+</script>
+</body>
+</html>

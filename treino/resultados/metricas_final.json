@@ -1,0 +1,261 @@
+{
+ "fold_teste": 5,
+ "fold_validacao": 1,
+ "melhor_epoca": 45,
+ "auc_validacao": 0.9457437175956936,
+ "largura": 1.0,
+ "mu": -1.3067708015441895,
+ "sd": 3.572601795196533,
+ "n_treino": 13434,
+ "segundos_treino": 232.2,
+ "float": {
+  "matriz_confusao_limpo": [
+   [
+    1236,
+    99,
+    90
+   ],
+   [
+    12,
+    55,
+    5
+   ],
+   [
+    34,
+    0,
+    38
+   ]
+  ],
+  "recall_por_classe_limpo": [
+   0.8673684210526316,
+   0.7638888888888888,
+   0.5277777777777778
+  ],
+  "precisao_por_classe_limpo": [
+   0.9641185647425897,
+   0.35714285714285715,
+   0.2857142857142857
+  ],
+  "alerta_motosserra": {
+   "0.5": {
+    "limiar": 0.5,
+    "recall_limpo": 0.7638888888888888,
+    "recall_por_snr": {
+     "20": 0.75,
+     "10": 0.6944444444444444,
+     "5": 0.6805555555555556,
+     "0": 0.7083333333333334,
+     "-5": 0.6666666666666666
+    },
+    "falso_positivo_ambiente": 0.06736842105263158,
+    "ic95_fp_ambiente": [
+     0.05548252950450401,
+     0.08158066910337526
+    ],
+    "n_janelas_ambiente": 1425,
+    "motor_confundido_com_motosserra": 0.0
+   },
+   "0.7": {
+    "limiar": 0.7,
+    "recall_limpo": 0.75,
+    "recall_por_snr": {
+     "20": 0.7083333333333334,
+     "10": 0.6805555555555556,
+     "5": 0.6527777777777778,
+     "0": 0.6527777777777778,
+     "-5": 0.5833333333333334
+    },
+    "falso_positivo_ambiente": 0.05052631578947368,
+    "ic95_fp_ambiente": [
+     0.04031364499390839,
+     0.06315590684444793
+    ],
+    "n_janelas_ambiente": 1425,
+    "motor_confundido_com_motosserra": 0.0
+   },
+   "0.8": {
+    "limiar": 0.8,
+    "recall_limpo": 0.7222222222222222,
+    "recall_por_snr": {
+     "20": 0.6944444444444444,
+     "10": 0.6666666666666666,
+     "5": 0.6388888888888888,
+     "0": 0.625,
+     "-5": 0.5555555555555556
+    },
+    "falso_positivo_ambiente": 0.036491228070175435,
+    "ic95_fp_ambiente": [
+     0.02793520103864207,
+     0.047539645158445124
+    ],
+    "n_janelas_ambiente": 1425,
+    "motor_confundido_com_motosserra": 0.0
+   },
+   "0.9": {
+    "limiar": 0.9,
+    "recall_limpo": 0.6805555555555556,
+    "recall_por_snr": {
+     "20": 0.6666666666666666,
+     "10": 0.5972222222222222,
+     "5": 0.5972222222222222,
+     "0": 0.5555555555555556,
+     "-5": 0.4861111111111111
+    },
+    "falso_positivo_ambiente": 0.02526315789473684,
+    "ic95_fp_ambiente": [
+     0.018303277966359957,
+     0.034775803717711946
+    ],
+    "n_janelas_ambiente": 1425,
+    "motor_confundido_com_motosserra": 0.0
+   },
+   "0.95": {
+    "limiar": 0.95,
+    "recall_limpo": 0.625,
+    "recall_por_snr": {
+     "20": 0.5833333333333334,
+     "10": 0.5833333333333334,
+     "5": 0.5416666666666666,
+     "0": 0.5,
+     "-5": 0.4444444444444444
+    },
+    "falso_positivo_ambiente": 0.017543859649122806,
+    "ic95_fp_ambiente": [
+     0.011911085652288898,
+     0.025770907929084985
+    ],
+    "n_janelas_ambiente": 1425,
+    "motor_confundido_com_motosserra": 0.0
+   }
+  },
+  "n_clipes_motosserra": 8,
+  "n_clipes_motor": 8,
+  "n_clipes_ambiente": 168
+ },
+ "int8": {
+  "matriz_confusao_limpo": [
+   [
+    1256,
+    99,
+    70
+   ],
+   [
+    13,
+    55,
+    4
+   ],
+   [
+    34,
+    0,
+    38
+   ]
+  ],
+  "recall_por_classe_limpo": [
+   0.8814035087719299,
+   0.7638888888888888,
+   0.5277777777777778
+  ],
+  "precisao_por_classe_limpo": [
+   0.9639293937068304,
+   0.35714285714285715,
+   0.3392857142857143
+  ],
+  "alerta_motosserra": {
+   "0.5": {
+    "limiar": 0.5,
+    "recall_limpo": 0.7638888888888888,
+    "recall_por_snr": {
+     "20": 0.7638888888888888,
+     "10": 0.6944444444444444,
+     "5": 0.6805555555555556,
+     "0": 0.7083333333333334,
+     "-5": 0.6388888888888888
+    },
+    "falso_positivo_ambiente": 0.06807017543859649,
+    "ic95_fp_ambiente": [
+     0.05612021056747259,
+     0.08234272332247011
+    ],
+    "n_janelas_ambiente": 1425,
+    "motor_confundido_com_motosserra": 0.0
+   },
+   "0.7": {
+    "limiar": 0.7,
+    "recall_limpo": 0.75,
+    "recall_por_snr": {
+     "20": 0.7083333333333334,
+     "10": 0.6805555555555556,
+     "5": 0.6388888888888888,
+     "0": 0.6388888888888888,
+     "-5": 0.5833333333333334
+    },
+    "falso_positivo_ambiente": 0.051228070175438595,
+    "ic95_fp_ambiente": [
+     0.040939756200129226,
+     0.06392953092029055
+    ],
+    "n_janelas_ambiente": 1425,
+    "motor_confundido_com_motosserra": 0.0
+   },
+   "0.8": {
+    "limiar": 0.8,
+    "recall_limpo": 0.7361111111111112,
+    "recall_por_snr": {
+     "20": 0.6944444444444444,
+     "10": 0.6666666666666666,
+     "5": 0.625,
+     "0": 0.6388888888888888,
+     "-5": 0.5555555555555556
+    },
+    "falso_positivo_ambiente": 0.037894736842105266,
+    "ic95_fp_ambiente": [
+     0.029158833785576304,
+     0.04911548297563781
+    ],
+    "n_janelas_ambiente": 1425,
+    "motor_confundido_com_motosserra": 0.0
+   },
+   "0.9": {
+    "limiar": 0.9,
+    "recall_limpo": 0.6666666666666666,
+    "recall_por_snr": {
+     "20": 0.6666666666666666,
+     "10": 0.5833333333333334,
+     "5": 0.5972222222222222,
+     "0": 0.5555555555555556,
+     "-5": 0.4722222222222222
+    },
+    "falso_positivo_ambiente": 0.025964912280701753,
+    "ic95_fp_ambiente": [
+     0.018895470328318946,
+     0.03558334663781641
+    ],
+    "n_janelas_ambiente": 1425,
+    "motor_confundido_com_motosserra": 0.0
+   },
+   "0.95": {
+    "limiar": 0.95,
+    "recall_limpo": 0.6527777777777778,
+    "recall_por_snr": {
+     "20": 0.5833333333333334,
+     "10": 0.5833333333333334,
+     "5": 0.5138888888888888,
+     "0": 0.5,
+     "-5": 0.4444444444444444
+    },
+    "falso_positivo_ambiente": 0.017543859649122806,
+    "ic95_fp_ambiente": [
+     0.011911085652288898,
+     0.025770907929084985
+    ],
+    "n_janelas_ambiente": 1425,
+    "motor_confundido_com_motosserra": 0.0
+   }
+  },
+  "n_clipes_motosserra": 8,
+  "n_clipes_motor": 8,
+  "n_clipes_ambiente": 168
+ },
+ "tamanho_tflite_bytes": 31864,
+ "parametros": 12531
+}

@@ -1,0 +1,34 @@
+{
+ "corpoxtampa": -0.0,
+ "corpoxplataforma": 0.0,
+ "corpoxanel_mic": 0.0,
+ "tampaxberco_painel": 0.0,
+ "tampaxperna_0": 0.0,
+ "tampaxperna_1": -0.0,
+ "tampaxperna_2": 0.0,
+ "tampaxperna_3": -0.0,
+ "berco_painelxperna_0": -0.0,
+ "berco_painelxperna_1": 0.0,
+ "berco_painelxperna_2": 0.0,
+ "berco_painelxperna_3": 0.0,
+ "fantasma_suporte_bateria": [
+  0.0,
+  0.0
+ ],
+ "fantasma_placa_mae": [
+  0.0,
+  0.0
+ ],
+ "fantasma_componentes_sobre_placa": [
+  0.0,
+  0.0
+ ],
+ "fantasma_microfone": [
+  0.0,
+  0.0
+ ],
+ "perna_0_dist_max": 0.0,
+ "perna_1_dist_max": 0.0,
+ "perna_2_dist_max": 0.0,
+ "perna_3_dist_max": 0.0
+}

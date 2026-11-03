@@ -1,0 +1,20 @@
+%%{init: {"themeVariables": {"fontSize": "17px"}}}%%
+flowchart TB
+  subgraph S["Sensor na árvore (ESP32-S3)"]
+    direction LR
+    A["Microfone I2S<br/>1 s a cada 3 s"] --> B["Atributos<br/>log-mel 31 x 32"] --> C["CNN int8<br/>31 KB"] --> D["Regra de decisão<br/>3 de 4 janelas"] --> E["Carga<br/>de 12 bytes"]
+  end
+  E -->|"LoRaWAN AU915, sub-banda 2"| G["Gateway"]
+  G --> N["TTN v3 ou ChirpStack v4"]
+  N -->|"webhook com token"| V
+  subgraph SV["Servidor (FastAPI + SQLite)"]
+    direction LR
+    V["Decodifica a carga<br/>e grava o alerta"] --> T["Aviso no Telegram"]
+    V --> P["Painel com mapa"]
+  end
+  T --> F["Fiscal confirma antes de despachar"]
+  P --> F
+  classDef c fill:#e8efe6,stroke:#14342a,color:#14342a
+  classDef g fill:#f7f6f1,stroke:#9a9a8f,color:#14342a
+  class A,B,C,D,E,G,N,V,T,P,F c
+  class S,SV g
